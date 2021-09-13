@@ -24,7 +24,7 @@
     "next": "^10.2.0",
     "node-fetch": "^2.6.1",
     "notion-client": "^4.6.4",
-    "notion-forge": "^0.0.5",
+    "notion-forge": "^0.0.7",
     "notion-types": "^4.6.4",
     "notion-utils": "^4.6.4",
     "p-map": "^4.0.0",

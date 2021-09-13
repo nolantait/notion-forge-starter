@@ -7,11 +7,16 @@ export interface PageError {
   statusCode: number
 }
 
-export interface PageProps {
-  site?: Site
-  recordMap?: ExtendedRecordMap
-  pageId?: string
-  error?: PageError
+export type PageProps = ResolvedPageProps | ErrorPageProps
+
+export interface ResolvedPageProps {
+  site: Site
+  recordMap: ExtendedRecordMap
+  pageId: string
+}
+
+export interface ErrorPageProps {
+  error: PageError
 }
 
 export interface Model {

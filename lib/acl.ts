@@ -52,4 +52,6 @@ export async function pageAcl({
       }
     }
   }
+
+  return {}
 }

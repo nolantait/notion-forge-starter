@@ -1,77 +1,97 @@
-import { parsePageId } from 'notion-utils'
-import { ExtendedRecordMap } from 'notion-types'
+import { parsePageId as Parser } from 'notion-utils'
 
 import * as acl from './acl'
-import * as types from './types'
+import { ResolvedPageProps, PageProps } from './types'
 import { pageUrlOverrides, pageUrlAdditions } from './config'
 import { getPage } from './notion'
 import { getSiteMaps } from './get-site-maps'
 import { getSiteForDomain } from './get-site-for-domain'
 
-export async function resolveNotionPage(domain: string, rawPageId?: string) {
-  let site: types.Site
-  let pageId: string
-  let recordMap: ExtendedRecordMap
+type MaybePageId = string | null
 
-  if (rawPageId && rawPageId !== 'index') {
-    pageId = parsePageId(rawPageId)
+export async function resolveNotionPage(
+  domain: string,
+  rawPageId?: string
+): Promise<PageProps> {
+  const isValidId = rawPageId && rawPageId !== 'index'
+  const resolveFunc = isValidId
+    ? resolveById(rawPageId, domain)
+    : resolveByDomain(domain)
+  const pageProps = await resolveFunc
+  const maybeAccessError = await acl.pageAcl(pageProps)
 
-    if (!pageId) {
-      // check if the site configuration provides an override of a fallback for
-      // the page's URI
-      const override =
-        pageUrlOverrides[rawPageId] || pageUrlAdditions[rawPageId]
+  return { ...pageProps, ...maybeAccessError }
+}
 
-      if (override) {
-        pageId = parsePageId(override)
-      }
-    }
+async function resolveById(
+  rawPageId: string,
+  domain: string
+): Promise<PageProps> {
+  const maybePageId = parsePageId(rawPageId)
 
-    if (pageId) {
-      const resources = await Promise.all([
-        getSiteForDomain(domain),
-        getPage(pageId)
-      ])
-
-      site = resources[0]
-      recordMap = resources[1]
-    } else {
-      // handle mapping of user-friendly canonical page paths to Notion page IDs
-      // e.g., /developer-x-entrepreneur versus /71201624b204481f862630ea25ce62fe
-      const siteMaps = await getSiteMaps()
-      const siteMap = siteMaps[0]
-      pageId = siteMap?.canonicalPageMap[rawPageId]
-
-      if (pageId) {
-        // TODO: we're not re-using the site from siteMaps because it is
-        // cached aggressively
-        // site = await getSiteForDomain(domain)
-        // recordMap = siteMap.pageMap[pageId]
-
-        const resources = await Promise.all([
-          getSiteForDomain(domain),
-          getPage(pageId)
-        ])
-
-        site = resources[0]
-        recordMap = resources[1]
-      } else {
-        return {
-          error: {
-            message: `Not found "${rawPageId}"`,
-            statusCode: 404
-          }
-        }
-      }
-    }
-  } else {
-    site = await getSiteForDomain(domain)
-    pageId = site.rootNotionPageId
-
-    console.log(site)
-    recordMap = await getPage(pageId)
+  if (maybePageId) {
+    return fetchById(maybePageId, domain)
   }
 
-  const props = { site, recordMap, pageId }
-  return { ...props, ...(await acl.pageAcl(props)) }
+  const idFromSitemap = await preparePageIdBySitemap(rawPageId)
+
+  if (idFromSitemap) {
+    // TODO: we're not re-using the site from siteMaps because it is
+    // cached aggressively
+    // site = await getSiteForDomain(domain)
+    // recordMap = siteMap.pageMap[pageId]
+
+    return fetchById(idFromSitemap, domain)
+  }
+
+  return {
+    error: {
+      message: `Not found "${rawPageId}"`,
+      statusCode: 404
+    }
+  }
+}
+
+async function resolveByDomain(domain: string): Promise<ResolvedPageProps> {
+  const site = await getSiteForDomain(domain)
+  const pageId = site.rootNotionPageId
+  const recordMap = await getPage(pageId)
+
+  return { site, pageId, recordMap }
+}
+
+async function fetchById(
+  pageId: string,
+  domain: string
+): Promise<ResolvedPageProps> {
+  const resources = await Promise.all([
+    getSiteForDomain(domain),
+    getPage(pageId)
+  ])
+
+  return {
+    pageId: pageId,
+    site: resources[0],
+    recordMap: resources[1]
+  }
+}
+
+function parsePageId(pageId: string): MaybePageId {
+  const parsedId = Parser(pageId)
+  return parsedId ? parseWithOverrides(parsedId) : null
+}
+
+function parseWithOverrides(pageId: string): MaybePageId {
+  // check if the site configuration provides an override of a fallback for
+  // the page's URI
+  const override = pageUrlOverrides[pageId] || pageUrlAdditions[pageId]
+  return override ? parsePageId(override) : null
+}
+
+async function preparePageIdBySitemap(rawPageId: string): Promise<MaybePageId> {
+  // handle mapping of user-friendly canonical page paths to Notion page IDs
+  // e.g., /developer-x-entrepreneur versus /71201624b204481f862630ea25ce62fe
+  const siteMaps = await getSiteMaps()
+  const siteMap = siteMaps[0]
+  return siteMap?.canonicalPageMap[rawPageId]
 }

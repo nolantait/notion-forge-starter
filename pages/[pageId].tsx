@@ -3,30 +3,25 @@ import { isDev, domain } from 'lib/config'
 import { getSiteMaps } from 'lib/get-site-maps'
 import { resolveNotionPage } from 'lib/resolve-notion-page'
 import { NotionPage } from 'components'
-import { PageProps } from '../lib/types'
-import { GetStaticProps } from 'next'
+import { ResolvedPageProps } from '../lib/types'
+import { NextPageContext } from 'next'
+import Layout from 'layouts/notion'
 
-function hasMachineReadablePaths(rawPageId: string): boolean {
-  return rawPageId === 'sitemap.xml' || rawPageId === 'robots.txt'
+interface NotionPageContext extends NextPageContext {
+  params?: {
+    pageId: string
+  }
 }
 
-export const getStaticProps: GetStaticProps = async (context) => {
-  const rawPageId = context?.params?.pageId as string
+export const getStaticProps = async (context: NotionPageContext) => {
+  const rawPageId = context.params?.pageId
   const isMachineReadable = hasMachineReadablePaths(rawPageId ?? '')
 
   try {
-    if (isMachineReadable) {
-      return {
-        redirect: {
-          destination: `/api/${rawPageId}`,
-          permanent: false
-        }
-      }
-    }
+    if (isMachineReadable) return redirectTo(rawPageId)
 
-    const props = await resolveNotionPage(domain, rawPageId)
-
-    return { props, revalidate: 10 }
+    const pageProps = await resolveNotionPage(domain, rawPageId)
+    return { pageProps, revalidate: 10 }
   } catch (err) {
     console.error('page error', domain, rawPageId, err)
 
@@ -46,22 +41,42 @@ export async function getStaticPaths() {
 
   const siteMaps = await getSiteMaps()
 
-  const ret = {
-    paths: siteMaps.flatMap((siteMap) =>
-      Object.keys(siteMap.canonicalPageMap).map((pageId) => ({
-        params: {
-          pageId
-        }
-      }))
-    ),
+  const paths = siteMaps.flatMap((siteMap) =>
+    Object.keys(siteMap.canonicalPageMap).map(formatSitemapPath)
+  )
+
+  return {
+    paths,
     // paths: [],
     fallback: true
   }
-
-  console.log(ret.paths)
-  return ret
 }
 
-export default function NotionDomainDynamicPage(props: PageProps) {
-  return <NotionPage {...props} />
+export default function NotionDomainDynamicPage(props: ResolvedPageProps) {
+  return (
+    <Layout {...props}>
+      <NotionPage {...props} />
+    </Layout>
+  )
+}
+
+function hasMachineReadablePaths(rawPageId: string): boolean {
+  return rawPageId === 'sitemap.xml' || rawPageId === 'robots.txt'
+}
+
+function redirectTo(pageId: string) {
+  return {
+    redirect: {
+      destination: `/api/${pageId}`,
+      permanent: false
+    }
+  }
+}
+
+function formatSitemapPath(pageId: string) {
+  return {
+    params: {
+      pageId
+    }
+  }
 }

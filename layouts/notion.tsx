@@ -2,17 +2,17 @@ import React from 'react'
 import { Navbar } from './navbar'
 import { Footer } from './footer'
 import { PageHead } from './page-head'
-import { Site } from '../lib/types'
+import { ResolvedPageProps } from '../lib/types'
 
-interface Props {
+interface Props extends ResolvedPageProps {
   children: React.ReactNode
-  site: Site
 }
 
-export default function Layout({ children, site }: Props) {
+export default function Layout(props: Props) {
+  const { children } = props
   return (
     <>
-      <PageHead site={site} />
+      <PageHead {...props} />
       <Navbar />
       <main>{children}</main>
       <Footer />

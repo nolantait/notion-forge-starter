@@ -2999,10 +2999,10 @@ notion-client@^4.6.4:
     notion-utils "^4.8.6"
     p-map "^4.0.0"
 
-notion-forge@^0.0.5:
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/notion-forge/-/notion-forge-0.0.5.tgz#35a18c8f08e6e7c297772c1bb4f177ffcd01d34f"
-  integrity sha512-nvSa7WJKtjmTZUI/zy4WU+DlTM1Wx+nBZF974WY0Ihus5jBb/7JZvwUNnImRtaI+lOh4hAiCWfDmTUrcbkHCJg==
+notion-forge@^0.0.7:
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/notion-forge/-/notion-forge-0.0.7.tgz#bc4c9bf8e58a9332ec05be4f6a408f0b711a2946"
+  integrity sha512-bBDu6HSvMHuM1pwmBUdfnP2N7Y/IgB1w4nFoWO90Cy+hNmDads97oxUSZa7xHJTHCx5wpFESUoN4CXXptrnqVQ==
   dependencies:
     "@matejmazur/react-katex" "^3.1.3"
     "@types/prismjs" "^1.16.6"

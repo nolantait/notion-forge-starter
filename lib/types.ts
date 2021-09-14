@@ -13,10 +13,13 @@ export interface ResolvedPageProps {
   site: Site
   recordMap: ExtendedRecordMap
   pageId: string
+  error: undefined
 }
 
 export interface ErrorPageProps {
   error: PageError
+  site?: Site
+  pageId?: string
 }
 
 export interface Model {

@@ -9,17 +9,19 @@ export interface PageError {
 
 export type PageProps = ResolvedPageProps | ErrorPageProps
 
-export interface ResolvedPageProps {
-  site: Site
-  recordMap: ExtendedRecordMap
-  pageId: string
+export interface ResolvedPageProps extends BasePageProps {
   error?: undefined
 }
 
-export interface ErrorPageProps {
+export interface ErrorPageProps extends BasePageProps {
   error: PageError
+}
+
+interface BasePageProps {
   site?: Site
+  recordMap?: ExtendedRecordMap
   pageId?: string
+  error?: undefined | PageError
 }
 
 export interface Model {

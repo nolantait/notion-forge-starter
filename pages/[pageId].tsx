@@ -13,6 +13,12 @@ interface NotionPageContext extends NextPageContext {
   }
 }
 
+interface Path {
+  params: {
+    pageId: string
+  }
+}
+
 export const getStaticProps = async (context: NotionPageContext) => {
   const { domain } = Config
   console.log(context)
@@ -30,12 +36,6 @@ export const getStaticProps = async (context: NotionPageContext) => {
     // we don't want to publish the error version of this page, so
     // let next.js know explicitly that incremental SSG failed
     throw err
-  }
-}
-
-interface Path {
-  params: {
-    pageId: string
   }
 }
 

@@ -1,6 +1,6 @@
 {
-  "name": "Homiro",
-  "short_name": "Homiro",
+  "name": "Your site",
+  "short_name": "Your site",
   "icons": [
     {
       "src": "/favicon.ico",

@@ -1,9 +1,9 @@
 import * as React from 'react'
 import Head from 'next/head'
-import { useRouter } from 'next/router'
 import cs from 'classnames'
-import { useSearchParam } from 'react-use'
 import BodyClassName from 'react-body-classname'
+import { useRouter } from 'next/router'
+import { useSearchParam } from 'react-use'
 
 // Notion
 import { NotionRenderer } from 'notion-forge'
@@ -13,6 +13,7 @@ import { PageBlock, ExtendedRecordMap } from 'notion-types'
 import { mapPageUrl, getCanonicalPageUrl } from 'lib/map-page-url'
 import { mapNotionImageUrl } from 'lib/map-image-url'
 import { getPageDescription } from 'lib/get-page-description'
+import { getBlockKeys } from 'lib/get-block-keys'
 import { getPageStyle } from 'lib/get-page-style'
 import { getPageTitle } from 'lib/get-page-title'
 import { PageProps, ErrorPageProps, ResolvedPageProps } from 'lib/types'
@@ -34,7 +35,7 @@ const CustomizedComponents = {
 }
 
 export const NotionPage: React.FC<PageProps> = (props) => {
-  if (props.error || shouldRenderError(props as ResolvedPageProps)) {
+  if (shouldRenderError(props)) {
     return RenderErrorPage(props as ErrorPageProps)
   } else {
     return RenderNotionPage(props as ResolvedPageProps)
@@ -63,8 +64,10 @@ const RenderNotionPage: React.FC<ResolvedPageProps> = (props) => {
   // Getting Page Data
   const blocks = recordMap.block
   const firstBlockKey = Object.keys(blocks)[0]
-  const block = recordMap.block[firstBlockKey].value as PageBlock
-  const page: Page = { block, recordMap }
+  const block = recordMap.block[firstBlockKey].value
+  if (!block) throw new Error(`Could not find block ${firstBlockKey}`)
+
+  const page: Page = { block: (block as PageBlock), recordMap }
   const title = getPageTitle(block, recordMap) || site.name
 
   // Head Setup
@@ -122,12 +125,16 @@ const RenderNotionPage: React.FC<ResolvedPageProps> = (props) => {
   )
 }
 
-function shouldRenderError(props: ResolvedPageProps): boolean {
+function shouldRenderError(props: PageProps): boolean {
+  if (props.error) {
+    return true
+  }
+
   const { recordMap } = props
-  // Getting Page Data
-  const keys = Object.keys(recordMap?.block || {})
-  const block = recordMap?.block?.[keys[0]]?.value
-  const isInvalid = !keys.length || !block
+  const { keys, rootKey } = getBlockKeys(recordMap)
+
+  const block = recordMap?.block[rootKey]?.value
+  const isInvalid = !rootKey || !block
 
   return isInvalid
 }

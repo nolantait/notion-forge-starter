@@ -2,11 +2,11 @@ import pMemoize from 'p-memoize'
 import { getAllPagesInSpace } from 'notion-utils'
 
 import * as types from './types'
-import { includeNotionIdInUrls } from './config'
+import { Config } from './config'
 import { notion } from './notion'
 import { getCanonicalPageId } from './get-canonical-page-id'
 
-const uuid = !!includeNotionIdInUrls
+const uuid = !!Config.includeNotionIdInUrls
 
 export const getAllPages = pMemoize(getAllPagesImpl, { maxAge: 60000 * 5 })
 

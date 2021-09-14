@@ -1,14 +1,14 @@
 import pMemoize from 'p-memoize'
 
-import { api } from './config'
-import * as types from './types'
+import { Config } from './config'
+import { SearchParams, SearchResults } from './types'
 
 export const searchNotion = pMemoize(searchNotionImpl, { maxAge: 10000 })
 
 async function searchNotionImpl(
-  params: types.SearchParams
-): Promise<types.SearchResults> {
-  return fetch(api.searchNotion, {
+  params: SearchParams
+): Promise<SearchResults> {
+  return fetch(Config.api.searchNotion, {
     method: 'POST',
     body: JSON.stringify(params),
     headers: {

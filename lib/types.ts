@@ -29,7 +29,7 @@ export interface Model {
   updatedAt: number
 }
 
-export interface Site extends Model {
+export interface Site {
   name: string
   domain: string
   rootNotionPageId: string
@@ -41,8 +41,6 @@ export interface Site extends Model {
   // Opengraph Metadata
   description?: string
   image?: string
-  timestamp: Date
-  isDisabled: boolean
 }
 
 export interface SiteMap {

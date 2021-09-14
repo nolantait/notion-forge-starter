@@ -34,8 +34,8 @@ const CustomizedComponents = {
 }
 
 export const NotionPage: React.FC<PageProps> = (props) => {
-  if (props.error || shouldRenderError) {
-    return RenderErrorPage(props)
+  if (props.error || shouldRenderError(props as ResolvedPageProps)) {
+    return RenderErrorPage(props as ErrorPageProps)
   } else {
     return RenderNotionPage(props as ResolvedPageProps)
   }

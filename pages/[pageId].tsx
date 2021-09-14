@@ -15,6 +15,7 @@ interface NotionPageContext extends NextPageContext {
 
 export const getStaticProps = async (context: NotionPageContext) => {
   const { domain } = Config
+  console.log(context)
   const rawPageId = context.params?.pageId
   const isMachineReadable = hasMachineReadablePaths(rawPageId ?? '')
 

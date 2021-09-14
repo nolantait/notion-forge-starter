@@ -11,6 +11,8 @@ const config: Config.InitialOptions = {
   "transform": {
     "^.+\\.(ts|tsx)$": "ts-jest"
   },
+  "snapshotSerializers": ["enzyme-to-json/serializer"],
+  "setupFilesAfterEnv": ["<rootDir>/spec/setup-enzyme.ts"],
 }
 
 export default config

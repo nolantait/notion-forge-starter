@@ -6,20 +6,26 @@ export async function pageAcl({
   recordMap,
   pageId
 }: PageProps): Promise<PageProps> {
-  if (!site) return missingSite
+  if (!site) {
+    return missingSite
+  }
 
-  const { domain, rootNotionSpaceId = "" } = site
+  const { domain, rootNotionSpaceId } = site
 
-  if (!recordMap) return missingRecordMap(domain, pageId)
+  if (!recordMap) {
+    return missingRecordMap(domain, pageId)
+  }
 
   const { keys, rootKey } = getBlockKeys(recordMap)
 
-  if (!rootKey) return invalidData(domain, pageId)
+  if (!rootKey) {
+    return invalidData(domain, pageId)
+  }
 
   const rootValue = recordMap.block[rootKey]?.value
   const rootSpaceId = rootValue?.space_id
 
-  if (rootSpaceId && rootSpaceId !== rootNotionSpaceId) {
+  if (rootSpaceId && rootNotionSpaceId && rootSpaceId !== rootNotionSpaceId) {
     if (process.env.NODE_ENV) {
       return missingPageError(domain, pageId)
     }

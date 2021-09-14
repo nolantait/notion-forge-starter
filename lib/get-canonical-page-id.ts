@@ -17,6 +17,7 @@ export function getCanonicalPageId(
   }
 
   const override = Config.inversePageUrlOverrides[cleanPageId]
+
   if (override) {
     return override
   } else {

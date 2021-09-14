@@ -1,43 +1,31 @@
 import { Block } from 'notion-types'
 import { Config } from './config'
 
-export const mapNotionImageUrl = (url: string, block: Block) => {
-  const { imageCDNHost } = Config
+const protocol = 'https://'
+const baseNotionUrl = 'www.notion.so'
 
+export const mapNotionImageUrl = (url: string, block: Block) => {
   if (!url) {
     return null
   }
 
-  if (url.startsWith('data:')) {
+  if (isData(url) || isCDN(url)) {
     return url
   }
 
-  if (imageCDNHost && url.startsWith(imageCDNHost)) {
-    return url
-  }
-
-  // const origUrl = url
-
-  if (url.startsWith('/images')) {
-    url = `https://www.notion.so${url}`
+  if (isRelativeImage(url)) {
+    return mapImageUrl(`https://www.notion.so${url}`)
   }
 
   // more recent versions of notion don't proxy unsplash images
-  if (!url.startsWith('https://images.unsplash.com')) {
-    url = `https://www.notion.so${
-      url.startsWith('/image') ? url : `/image/${encodeURIComponent(url)}`
-    }`
+  if (!isUnsplash(url)) {
+    const notionUrl = [
+      protocol,
+      baseNotionUrl,
+      isRelativeImage(url) ? url : `/image/${encodeURIComponent(url)}`
+    ].join('')
 
-    const notionImageUrlV2 = new URL(url)
-    let table = block.parent_table === 'space' ? 'block' : block.parent_table
-    if (table === 'collection') {
-      table = 'block'
-    }
-    notionImageUrlV2.searchParams.set('table', table)
-    notionImageUrlV2.searchParams.set('id', block.id)
-    notionImageUrlV2.searchParams.set('cache', 'v2')
-
-    url = notionImageUrlV2.toString()
+    url = buildNotionImageUrl(block, notionUrl)
   }
 
   // console.log({ url, origUrl })
@@ -57,4 +45,37 @@ export const mapImageUrl = (imageUrl: string) => {
   } else {
     return imageUrl
   }
+}
+
+const isData = (url: string): boolean => {
+  return url.startsWith('data:')
+}
+
+const isCDN = (url: string): boolean => {
+  const { imageCDNHost } = Config
+
+  return imageCDNHost && url.startsWith(imageCDNHost)
+}
+
+const isRelativeImage = (url: string): boolean => {
+  return url.startsWith('/images')
+}
+
+const isUnsplash = (url: string): boolean => {
+  return url.startsWith('https://images.unsplash.com')
+}
+
+const buildNotionImageUrl = (block: Block, url: string): string => {
+  const notionImageUrlV2 = new URL(url)
+  const parentIsSpace = block.parent_table === 'space'
+  let table = parentIsSpace ? 'block' : block.parent_table
+  if (table === 'collection') {
+    table = 'block'
+  }
+
+  notionImageUrlV2.searchParams.set('table', table)
+  notionImageUrlV2.searchParams.set('id', block.id)
+  notionImageUrlV2.searchParams.set('cache', 'v2')
+
+  return notionImageUrlV2.toString()
 }

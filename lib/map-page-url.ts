@@ -14,7 +14,10 @@ export const mapPageUrl = (
   recordMap: ExtendedRecordMap,
   searchParams: URLSearchParams
 ) => (pageId = '') => {
-  if (uuidToId(pageId) === site.rootNotionPageId) {
+  const { rootNotionPageId } = site
+  const isRootId = uuidToId(pageId) === rootNotionPageId
+
+  if (isRootId) {
     return createUrl('/', searchParams)
   } else {
     return createUrl(
@@ -28,14 +31,19 @@ export const getCanonicalPageUrl = (
   site: Site,
   recordMap: ExtendedRecordMap
 ) => (pageId = '') => {
+  const { domain } = site
   const pageUuid = parsePageId(pageId, { uuid: true })
+  const protocol = 'https'
+  const baseUrl = [protocol, '://', domain].join('')
+  const isRootId = uuidToId(pageId) === site.rootNotionPageId
+  const canonicalPageId = getCanonicalPageId(pageUuid, recordMap, {
+    uuid
+  })
 
-  if (uuidToId(pageId) === site.rootNotionPageId) {
-    return `https://${site.domain}`
+  if (isRootId) {
+    return baseUrl
   } else {
-    return `https://${site.domain}/${getCanonicalPageId(pageUuid, recordMap, {
-      uuid
-    })}`
+    return `${baseUrl}/${canonicalPageId}`
   }
 }
 

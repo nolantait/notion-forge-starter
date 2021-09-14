@@ -1,6 +1,8 @@
 import { ExtendedRecordMap } from "notion-types"
 
-export function getBlockKeys(recordMap: ExtendedRecordMap): { keys: string[], rootKey: string } {
+type Keys = { keys: string[], rootKey: string | undefined }
+
+export function getBlockKeys(recordMap: ExtendedRecordMap): Keys {
   const keys = Object.keys(recordMap.block)
   const rootKey = keys[0]
 

@@ -45,6 +45,11 @@ const RenderErrorPage: React.FC<ErrorPageProps> = (props) => {
   return <Page404 {...props} />
 }
 
+interface Page {
+  block: PageBlock,
+  recordMap: ExtendedRecordMap
+}
+
 const RenderNotionPage: React.FC<ResolvedPageProps> = (props) => {
   const { recordMap, pageId, site } = props
   const router = useRouter()
@@ -59,16 +64,17 @@ const RenderNotionPage: React.FC<ResolvedPageProps> = (props) => {
   const blocks = recordMap.block
   const firstBlockKey = Object.keys(blocks)[0]
   const block = recordMap.block[firstBlockKey].value as PageBlock
+  const page: Page = { block, recordMap }
   const title = getPageTitle(block, recordMap) || site.name
 
   // Head Setup
-  const { socialImage, socialDescription } = getSocialInfo(block, recordMap)
+  const { socialImage, socialDescription } = getSocialInfoForPage(page)
 
   // OEmbed Lite Mode Check
   const isLiteMode = lite === 'true'
   const params = isLiteMode ? lite : {}
   const searchParams = new URLSearchParams(params)
-  const bodyClass = getBodyClass(block, recordMap, isLiteMode)
+  const bodyClass = getBodyStyleForPage(page, isLiteMode)
 
   // Page URL Settings
   const { siteMapPageUrl, canonicalPageUrl } = getPageUrlSettings({
@@ -126,12 +132,12 @@ function shouldRenderError(props: ResolvedPageProps): boolean {
   return isInvalid
 }
 
-function getBodyClass(
-  block: PageBlock,
-  recordMap: ExtendedRecordMap,
+function getBodyStyleForPage(
+  page: Page,
   lite: boolean
 ): string[] {
   // Page Styling
+  const { block, recordMap } = page
   const baseStyle = getPageStyle(block, recordMap) ?? ''
   const formatTag = (tag: string) => {
     return tag
@@ -148,9 +154,11 @@ function getBodyClass(
   return lite ? style.concat(['notion-lite']) : style
 }
 
-function getSocialInfo(block: PageBlock, recordMap: ExtendedRecordMap) {
+function getSocialInfoForPage(page: Page) {
+  const { block, recordMap } = page
+
   const socialImage = mapNotionImageUrl(
-    (block as PageBlock).format?.page_cover || Config.defaultPageCover,
+    block.format?.page_cover || Config.defaultPageCover,
     block
   )
   const socialDescription =

@@ -13,7 +13,7 @@ export interface ResolvedPageProps {
   site: Site
   recordMap: ExtendedRecordMap
   pageId: string
-  error: undefined
+  error?: undefined
 }
 
 export interface ErrorPageProps {
@@ -37,7 +37,6 @@ export interface Site extends Model {
   // Settings
   html?: string
   fontFamily?: string
-  darkMode?: boolean
   previewImages?: boolean
   // Opengraph Metadata
   description?: string

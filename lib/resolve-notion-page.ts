@@ -2,7 +2,7 @@ import { parsePageId as Parser } from 'notion-utils'
 
 import * as acl from './acl'
 import { ResolvedPageProps, PageProps } from './types'
-import { pageUrlOverrides, pageUrlAdditions } from './config'
+import { Config } from './config'
 import { getPage } from './notion'
 import { getSiteMaps } from './get-site-maps'
 import { getSiteForDomain } from './get-site-for-domain'
@@ -54,7 +54,7 @@ async function resolveById(
 
 async function resolveByDomain(domain: string): Promise<ResolvedPageProps> {
   const site = await getSiteForDomain(domain)
-  const pageId = site.rootNotionPageId
+  const pageId: string = site.rootNotionPageId
   const recordMap = await getPage(pageId)
 
   return { site, pageId, recordMap }
@@ -82,6 +82,7 @@ function parsePageId(pageId: string): MaybePageId {
 }
 
 function parseWithOverrides(pageId: string): MaybePageId {
+  const { pageUrlOverrides, pageUrlAdditions } = Config
   // check if the site configuration provides an override of a fallback for
   // the page's URI
   const override = pageUrlOverrides[pageId] || pageUrlAdditions[pageId]

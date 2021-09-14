@@ -3,7 +3,7 @@ import { Config } from 'lib/config'
 import { getSiteMaps } from 'lib/get-site-maps'
 import { resolveNotionPage } from 'lib/resolve-notion-page'
 import { NotionPage } from 'components'
-import { ResolvedPageProps } from '../lib/types'
+import { ResolvedPageProps, SiteMap } from '../lib/types'
 import { NextPageContext } from 'next'
 import Layout from 'layouts/notion'
 
@@ -32,6 +32,12 @@ export const getStaticProps = async (context: NotionPageContext) => {
   }
 }
 
+interface Path {
+  params: {
+    pageId: string
+  }
+}
+
 export async function getStaticPaths() {
   if (Config.isDev) {
     return {
@@ -42,9 +48,9 @@ export async function getStaticPaths() {
 
   const siteMaps = await getSiteMaps()
 
-  const paths = siteMaps.flatMap((siteMap) =>
-    Object.keys(siteMap.canonicalPageMap).map(formatSitemapPath)
-  )
+  const mapSitemap = (siteMap: SiteMap) =>
+    Object.keys(siteMap.canonicalPageMap).map(formatSitemapParams)
+  const paths: Array<Path> = siteMaps.flatMap(mapSitemap)
 
   return {
     paths,
@@ -74,7 +80,7 @@ function redirectTo(pageId: string) {
   }
 }
 
-function formatSitemapPath(pageId: string) {
+function formatSitemapParams(pageId: string) {
   return {
     params: {
       pageId

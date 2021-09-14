@@ -1,23 +1,21 @@
 import { parsePageId, getPageTitle } from 'notion-utils'
 import { getPage } from './notion'
-import * as config from './config'
+import { Config } from './config'
 
 export const oembed = async ({
   url,
   maxWidth,
-  maxHeight,
-  dark = false
+  maxHeight
 }: {
   url: string
   maxWidth?: number
   maxHeight?: number
-  dark?: boolean
 }) => {
   // TODO: handle pages with no pageId via domain
   const pageId = parsePageId(url)
 
-  let title = config.name
-  let authorName = config.author
+  let title = Config.name
+  let authorName = Config.author
 
   // TODO: handle errors gracefully
 
@@ -33,12 +31,9 @@ export const oembed = async ({
   if (name) authorName = name
 
   const params: any = { lite: 'true' }
-  if (dark) {
-    params.dark = 'true'
-  }
 
   const query = new URLSearchParams(params).toString()
-  const embedUrl = `${config.host}/${pageId}?${query}`
+  const embedUrl = `${Config.host}/${pageId}?${query}`
   const defaultWidth = 800
   const defaultHeight = 600
   const width = maxWidth ? Math.min(maxWidth, defaultWidth) : defaultWidth
@@ -47,8 +42,8 @@ export const oembed = async ({
   return {
     version: '1.0',
     type: 'rich',
-    provider_name: config.author,
-    provider_url: config.host,
+    provider_name: Config.author,
+    provider_url: Config.host,
     title,
     author_name: authorName,
     url,

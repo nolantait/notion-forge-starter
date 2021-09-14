@@ -129,7 +129,7 @@ const RenderNotionPage: React.FC<ResolvedPageProps> = (props) => {
   )
 }
 
-const shouldRenderError = (props: ResolvedPageProps): boolean => {
+function shouldRenderError(props: ResolvedPageProps): boolean {
   const { recordMap } = props
   // Getting Page Data
   const keys = Object.keys(recordMap?.block || {})

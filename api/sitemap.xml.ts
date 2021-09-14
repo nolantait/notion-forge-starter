@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import { SiteMap } from '../lib/types'
-import { host } from '../lib/config'
+import { Config } from '../lib/config'
 import { getSiteMaps } from '../lib/get-site-maps'
 
 export default async (
@@ -20,11 +20,11 @@ export default async (
     'public, s-maxage=3600, max-age=3600, stale-while-revalidate=3600'
   )
   res.setHeader('Content-Type', 'text/xml')
-  res.write(createSitemap(siteMaps[0]))
+  res.write(createSitemap(siteMaps[0], Config.host))
   res.end()
 }
 
-const createSitemap = (siteMap: SiteMap) => {
+const createSitemap = (siteMap: SiteMap, host: string) => {
   return `<?xml version="1.0" encoding="UTF-8"?>
       <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
         <url>

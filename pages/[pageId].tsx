@@ -1,5 +1,5 @@
 import React from 'react'
-import { isDev, domain } from 'lib/config'
+import { Config } from 'lib/config'
 import { getSiteMaps } from 'lib/get-site-maps'
 import { resolveNotionPage } from 'lib/resolve-notion-page'
 import { NotionPage } from 'components'
@@ -14,6 +14,7 @@ interface NotionPageContext extends NextPageContext {
 }
 
 export const getStaticProps = async (context: NotionPageContext) => {
+  const { domain } = Config
   const rawPageId = context.params?.pageId
   const isMachineReadable = hasMachineReadablePaths(rawPageId ?? '')
 
@@ -32,7 +33,7 @@ export const getStaticProps = async (context: NotionPageContext) => {
 }
 
 export async function getStaticPaths() {
-  if (isDev) {
+  if (Config.isDev) {
     return {
       paths: [],
       fallback: true

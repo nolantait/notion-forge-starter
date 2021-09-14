@@ -1,11 +1,13 @@
 import React from 'react'
-import { domain } from 'lib/config'
+import { Config } from 'lib/config'
 import { resolveNotionPage } from 'lib/resolve-notion-page'
 import { NotionPage } from 'components'
 import { ResolvedPageProps } from '../lib/types'
 import Layout from 'layouts/notion'
 
 export const getStaticProps = async () => {
+  const { domain } = Config
+
   try {
     const props = await resolveNotionPage(domain)
 

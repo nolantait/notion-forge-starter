@@ -16,7 +16,7 @@ import { getPageDescription } from 'lib/get-page-description'
 import { getPageStyle } from 'lib/get-page-style'
 import { getPageTitle } from 'lib/get-page-title'
 import { PageProps, ErrorPageProps, ResolvedPageProps } from 'lib/types'
-import * as config from 'lib/config'
+import { Config } from 'lib/config'
 
 // Components
 import { Loading } from '../layouts/loading'
@@ -28,14 +28,6 @@ import { CanonicalPageUrl } from '../layouts/canonical-page-url'
 
 // Styles
 import styles from '../layouts/styles.module.scss'
-
-interface Config {
-  isDev: boolean
-  defaultPageIcon: string | null
-  defaultPageCover: string | null
-  defaultPageCoverPosition: number
-  description?: string
-}
 
 const CustomizedComponents = {
   pageLink: PageLink
@@ -70,11 +62,7 @@ const RenderNotionPage: React.FC<ResolvedPageProps> = (props) => {
   const title = getPageTitle(block, recordMap) || site.name
 
   // Head Setup
-  const { socialImage, socialDescription } = getSocialInfo(
-    block,
-    recordMap,
-    config
-  )
+  const { socialImage, socialDescription } = getSocialInfo(block, recordMap)
 
   // OEmbed Lite Mode Check
   const isLiteMode = lite === 'true'
@@ -87,11 +75,10 @@ const RenderNotionPage: React.FC<ResolvedPageProps> = (props) => {
     site,
     recordMap,
     searchParams,
-    config,
     pageId
   })
 
-  const { defaultPageIcon, defaultPageCover, defaultPageCoverPosition } = config
+  const { defaultPageIcon, defaultPageCover, defaultPageCoverPosition } = Config
 
   const notionRendererProps = {
     recordMap,
@@ -161,25 +148,21 @@ function getBodyClass(
   return lite ? style.concat(['notion-lite']) : style
 }
 
-function getSocialInfo(
-  block: PageBlock,
-  recordMap: ExtendedRecordMap,
-  config: Config
-) {
+function getSocialInfo(block: PageBlock, recordMap: ExtendedRecordMap) {
   const socialImage = mapNotionImageUrl(
-    (block as PageBlock).format?.page_cover || config.defaultPageCover,
+    (block as PageBlock).format?.page_cover || Config.defaultPageCover,
     block
   )
   const socialDescription =
-    getPageDescription(block, recordMap) ?? config.description
+    getPageDescription(block, recordMap) ?? Config.description
 
   return { socialImage, socialDescription }
 }
 
-function getPageUrlSettings({ site, recordMap, searchParams, pageId, config }) {
+function getPageUrlSettings({ site, recordMap, searchParams, pageId }) {
   const siteMapPageUrl = mapPageUrl(site, recordMap, searchParams)
   const canonicalPageUrl =
-    !config.isDev && getCanonicalPageUrl(site, recordMap)(pageId)
+    !Config.isDev && getCanonicalPageUrl(site, recordMap)(pageId)
 
   return { siteMapPageUrl, canonicalPageUrl }
 }

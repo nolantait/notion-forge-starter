@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import { host } from '../lib/config'
+import { Config } from '../lib/config'
 
 export default async (
   req: NextApiRequest,
@@ -17,7 +17,7 @@ export default async (
   )
   res.setHeader('Content-Type', 'text/plain')
   res.write(`User-agent: *
-Sitemap: ${host}/api/sitemap.xml
+Sitemap: ${Config.host}/api/sitemap.xml
 `)
   res.end()
 }

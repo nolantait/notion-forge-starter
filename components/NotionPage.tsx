@@ -47,7 +47,7 @@ const RenderErrorPage: React.FC<ErrorPageProps> = (props) => {
 }
 
 interface Page {
-  block: PageBlock,
+  block: PageBlock
   recordMap: ExtendedRecordMap
 }
 
@@ -67,7 +67,7 @@ const RenderNotionPage: React.FC<ResolvedPageProps> = (props) => {
   const block = recordMap.block[firstBlockKey].value
   if (!block) throw new Error(`Could not find block ${firstBlockKey}`)
 
-  const page: Page = { block: (block as PageBlock), recordMap }
+  const page: Page = { block: block as PageBlock, recordMap }
   const title = getPageTitle(block, recordMap) || site.name
 
   // Head Setup
@@ -131,7 +131,7 @@ function shouldRenderError(props: PageProps): boolean {
   }
 
   const { recordMap } = props
-  const { keys, rootKey } = getBlockKeys(recordMap)
+  const { rootKey } = getBlockKeys(recordMap)
 
   const block = recordMap?.block[rootKey]?.value
   const isInvalid = !rootKey || !block
@@ -139,10 +139,7 @@ function shouldRenderError(props: PageProps): boolean {
   return isInvalid
 }
 
-function getBodyStyleForPage(
-  page: Page,
-  lite: boolean
-): string[] {
+function getBodyStyleForPage(page: Page, lite: boolean): string[] {
   // Page Styling
   const { block, recordMap } = page
   const baseStyle = getPageStyle(block, recordMap) ?? ''

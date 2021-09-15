@@ -1,6 +1,10 @@
 import React from 'react'
 
-export const CanonicalPageUrl: React.FC<{ url: string }> = ({ url }) => {
+interface CanonicalPageProps {
+  url: string
+}
+
+export const CanonicalPage = ({ url }: CanonicalPageProps) => {
   return (
     <>
       <meta name='url' content={url} />

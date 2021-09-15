@@ -7,7 +7,7 @@
 
 import { parsePageId } from 'notion-utils'
 import { getSiteConfig, getEnv } from './get-config-value'
-import { PageUrlOverridesMap, PageUrlOverridesInverseMap } from './types'
+import { PageUrlOverridesMap, PageUrlOverridesInverseMap } from '@types'
 
 export namespace Config {
   export const rootNotionPageId: string = parsePageId(
@@ -64,13 +64,13 @@ export namespace Config {
   )
 
   // default notion values for site-wide consistency (optional; may be overridden on a per-page basis)
-  export const defaultPageIcon: string | null = getSiteConfig(
+  export const defaultPageIcon: string | undefined = getSiteConfig(
     'defaultPageIcon',
-    null
+    undefined
   )
-  export const defaultPageCover: string | null = getSiteConfig(
+  export const defaultPageCover: string | undefined = getSiteConfig(
     'defaultPageCover',
-    null
+    undefined
   )
   export const defaultPageCoverPosition: number = getSiteConfig(
     'defaultPageCoverPosition',

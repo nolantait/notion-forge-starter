@@ -1,5 +1,5 @@
 import { NotionAPI } from 'notion-client'
-import { ExtendedRecordMap, SearchParams, SearchResults } from 'notion-types'
+import { ExtendedRecordMap, SearchParams, SearchResults } from '@types'
 
 export const notion = new NotionAPI({
   apiBaseUrl: process.env.NOTION_API_BASE_URL

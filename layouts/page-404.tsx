@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import * as React from 'react'
-import * as types from 'lib/types'
+import * as types from '@types'
 import { PageHead } from './page-head'
 
 import styles from './styles.module.scss'

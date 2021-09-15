@@ -1,6 +1,8 @@
 import React from 'react'
 
-export const SocialImage: React.FC<{ image: string }> = ({ image }) => {
+export const SocialImage: React.FC<{ image: string | undefined }> = ({
+  image
+}) => {
   const defaultCard = <meta name='twitter:card' content='summary' />
 
   if (!image) return defaultCard

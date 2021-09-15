@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import * as types from '../lib/types'
-import { search } from '../lib/notion'
+import * as types from 'types'
+import { search } from '@lib/notion'
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
@@ -10,7 +10,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   const searchParams: types.SearchParams = req.body
 
-  console.log('lambda search-notion', searchParams)
   const results = await search(searchParams)
 
   res.setHeader(

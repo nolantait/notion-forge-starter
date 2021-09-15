@@ -1,11 +1,10 @@
 import React from 'react'
-import { Config } from 'lib/config'
-import { getSiteMaps } from 'lib/get-site-maps'
-import { resolveNotionPage } from 'lib/resolve-notion-page'
-import { NotionPage } from 'components'
-import { ResolvedPageProps, SiteMap } from '../lib/types'
 import { NextPageContext } from 'next'
-import Layout from 'layouts/notion'
+
+import { ResolvedPageProps, SiteMap } from '@types'
+import { Config, getSiteMaps, resolveNotionPage } from '@lib'
+import { NotionPage } from '@components'
+import Layout from '@layouts/notion'
 
 interface NotionPageContext extends NextPageContext {
   params?: {

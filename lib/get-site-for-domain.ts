@@ -1,10 +1,8 @@
-import { Config }from './config'
-import { Site } from './types'
+import { Config } from './config'
+import { Site } from '@types'
 
-export const getSiteForDomain = async (
-  domain: string
-): Promise<Site> => {
-  const { name, rootNotionPageId, rootNotionSpaceId, description} = Config
+export const getSiteForDomain = async (domain: string): Promise<Site> => {
+  const { name, rootNotionPageId, rootNotionSpaceId, description } = Config
 
   return {
     domain,

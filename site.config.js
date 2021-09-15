@@ -11,7 +11,6 @@ module.exports = {
   domain: 'yourdomain.com',
   author: 'Your name',
   email: 'youremail@emailserver.tld',
-  phoneNumber: '12345678',
 
   // open graph metadata (optional)
   description: 'A good description of your website',

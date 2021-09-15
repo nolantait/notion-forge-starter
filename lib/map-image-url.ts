@@ -4,9 +4,9 @@ import { Config } from './config'
 const protocol = 'https://'
 const baseNotionUrl = 'www.notion.so'
 
-export const mapNotionImageUrl = (url: string, block: Block) => {
+export const mapNotionImageUrl = (url: string, block: Block): string => {
   if (!url) {
-    return null
+    throw new Error('Missing image url')
   }
 
   if (isData(url) || isCDN(url)) {
@@ -28,7 +28,6 @@ export const mapNotionImageUrl = (url: string, block: Block) => {
     url = buildNotionImageUrl(block, notionUrl)
   }
 
-  // console.log({ url, origUrl })
   return mapImageUrl(url)
 }
 
@@ -54,7 +53,7 @@ const isData = (url: string): boolean => {
 const isCDN = (url: string): boolean => {
   const { imageCDNHost } = Config
 
-  return imageCDNHost && url.startsWith(imageCDNHost)
+  return imageCDNHost ? url.startsWith(imageCDNHost) : false
 }
 
 const isRelativeImage = (url: string): boolean => {

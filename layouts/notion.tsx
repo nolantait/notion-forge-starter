@@ -2,7 +2,7 @@ import React from 'react'
 import { Navbar } from './navbar'
 import { Footer } from './footer'
 import { PageHead } from './page-head'
-import { ResolvedPageProps } from '../lib/types'
+import { ResolvedPageProps } from '@types'
 
 interface Props extends ResolvedPageProps {
   children: React.ReactNode

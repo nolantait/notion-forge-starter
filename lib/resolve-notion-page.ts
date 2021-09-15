@@ -1,7 +1,7 @@
 import { parsePageId as Parser } from 'notion-utils'
+import { ResolvedPageProps, PageProps } from '@types'
 
 import * as acl from './acl'
-import { ResolvedPageProps, PageProps } from './types'
 import { Config } from './config'
 import { getPage } from './notion'
 import { getSiteMaps } from './get-site-maps'
@@ -14,10 +14,9 @@ export async function resolveNotionPage(
   rawPageId?: string
 ): Promise<PageProps> {
   const isValidId = rawPageId && rawPageId !== 'index'
-  const resolveFunc = isValidId
-    ? resolveById(rawPageId, domain)
-    : resolveByDomain(domain)
-  const pageProps = await resolveFunc
+  const pageProps = isValidId
+    ? await resolveById(rawPageId, domain)
+    : await resolveByDomain(domain)
   const maybeAccessError = await acl.pageAcl(pageProps)
 
   return { ...pageProps, ...maybeAccessError }

@@ -2,7 +2,11 @@ import * as React from 'react'
 import cs from 'classnames'
 import styles from './styles.module.scss'
 
-export const LoadingIcon = (props) => {
+interface LoadingIconProps {
+  className?: string
+}
+
+export const LoadingIcon: React.FC<LoadingIconProps> = (props) => {
   const { className, ...rest } = props
   return (
     <svg

@@ -1,8 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import { SiteMap } from '../lib/types'
-import { Config } from '../lib/config'
-import { getSiteMaps } from '../lib/get-site-maps'
+import { SiteMap } from '@types'
+import { Config, getSiteMaps } from '@lib'
 
 export default async (
   req: NextApiRequest,

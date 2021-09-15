@@ -1,7 +1,9 @@
 import React from 'react'
-import Link from 'next/link'
+import Link, { LinkProps } from 'next/link'
 
-export const PageLink = ({
+interface PageLinkProps extends LinkProps {}
+
+export const PageLink: React.FC<PageLinkProps> = ({
   href,
   as,
   passHref,

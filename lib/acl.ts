@@ -1,4 +1,4 @@
-import { PageProps } from './types'
+import { PageProps } from '@types'
 import { getBlockKeys } from './get-block-keys'
 
 export async function pageAcl({
@@ -6,21 +6,15 @@ export async function pageAcl({
   recordMap,
   pageId
 }: PageProps): Promise<PageProps> {
-  if (!site) {
-    return missingSite
-  }
+  if (!site) return missingSite
 
   const { domain, rootNotionSpaceId } = site
 
-  if (!recordMap) {
-    return missingRecordMap(domain, pageId)
-  }
+  if (!pageId) return missingId
+  if (!recordMap) return missingRecordMap(domain, pageId)
 
-  const { keys, rootKey } = getBlockKeys(recordMap)
-
-  if (!rootKey) {
-    return invalidData(domain, pageId)
-  }
+  const { rootKey } = getBlockKeys(recordMap)
+  if (!rootKey) return invalidData(domain, pageId)
 
   const rootValue = recordMap.block[rootKey]?.value
   const rootSpaceId = rootValue?.space_id
@@ -31,13 +25,20 @@ export async function pageAcl({
     }
   }
 
-  return {}
+  return { site, recordMap, pageId }
 }
 
 const missingSite = {
   error: {
     statusCode: 404,
     message: 'Unable to resolve notion site'
+  }
+}
+
+const missingId = {
+  error: {
+    statusCode: 404,
+    message: 'Missing an ID for this notion page'
   }
 }
 

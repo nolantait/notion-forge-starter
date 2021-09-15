@@ -1,14 +1,12 @@
 import pMemoize from 'p-memoize'
 import { getAllPagesInSpace } from 'notion-utils'
 
-import { SiteMap } from './types'
+import { SiteMap } from '@types'
 import { Config } from './config'
 import { notion } from './notion'
 import { getCanonicalPageId } from './get-canonical-page-id'
 
 const uuid = !!Config.includeNotionIdInUrls
-
-export const getAllPages = pMemoize(getAllPagesImpl, { maxAge: 60000 * 5 })
 
 export async function getAllPagesImpl(
   rootNotionPageId: string,
@@ -20,8 +18,8 @@ export async function getAllPagesImpl(
     notion.getPage.bind(notion)
   )
 
-  const canonicalPageMap = Object.keys(pageMap).reduce(
-    (map, pageId: string) => {
+  const canonicalPageMap = Object.keys(pageMap).reduce<Record<string, any>>(
+    (mappedPages, pageId: string) => {
       const recordMap = pageMap[pageId]
 
       if (!recordMap) throw new Error(`Error loading page "${pageId}"`)
@@ -30,20 +28,13 @@ export async function getAllPagesImpl(
         uuid
       })
 
-      if (map[canonicalPageId]) {
-        console.error(
-          'error duplicate canonical page id',
-          canonicalPageId,
-          pageId,
-          map[canonicalPageId]
-        )
+      const existingCanonicalId = mappedPages[canonicalPageId]
 
-        return map
-      } else {
-        return {
-          ...map,
-          [canonicalPageId]: pageId
-        }
+      if (existingCanonicalId) throw new Error('Duplicate canonical page ID')
+
+      return {
+        ...mappedPages,
+        [canonicalPageId]: pageId
       }
     },
     {}
@@ -54,3 +45,5 @@ export async function getAllPagesImpl(
     canonicalPageMap
   }
 }
+
+export const getAllPages = pMemoize(getAllPagesImpl, { maxAge: 60000 * 5 })

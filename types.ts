@@ -2,6 +2,50 @@ import { ExtendedRecordMap, PageMap } from 'notion-types'
 
 export * from 'notion-types'
 
+export type SiteOption =
+  | 'rootNotionPageId'
+  | 'rootNotionSpaceId'
+  | 'name'
+  | 'domain'
+  | 'email'
+  | 'description'
+  | 'socialImageSubtitle'
+  | 'socialImageTitle'
+  | 'defaultPageIcon'
+  | 'defaultPageCover'
+  | 'defaultPageCoverPosition'
+  | 'imageCDNHost'
+  | 'pageUrlOverrides'
+
+export type OptionalSiteOption =
+  | 'rootNotionSpaceId'
+  | 'defaultPageIcon'
+  | 'defaultPageCover'
+  | 'imageCDNHost'
+  | 'pageUrlOverrides'
+
+export type SiteConfigValue = string | number | null
+
+export type SiteConfig = {
+  [index: string]: SiteConfigValue | Record<string, SiteConfigValue>
+
+  rootNotionPageId: string
+  rootNotionSpaceId: string | null
+  name: string
+  domain: string
+  email: string
+  description: string
+  socialImageTitle: string
+  socialImageSubtitle: string
+  defaultPageIcon: string | null
+  defaultPageCover: string | null
+  defaultPageCoverPosition: number
+  imageCDNHost: string | null
+  pageUrlOverrides: Record<string, string> | null
+}
+
+export type WithChildren<T = {}> = T & { children?: React.ReactNode }
+
 export interface PageError {
   message?: string
   statusCode: number
@@ -10,6 +54,8 @@ export interface PageError {
 export type PageProps = ResolvedPageProps | ErrorPageProps
 
 export interface ResolvedPageProps extends BasePageProps {
+  site: Site
+  recordMap: ExtendedRecordMap
   error?: undefined
 }
 

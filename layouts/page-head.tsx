@@ -1,8 +1,12 @@
 import Head from 'next/head'
 import * as React from 'react'
-import * as types from 'lib/types'
+import { Site } from '@types'
 
-export const PageHead: React.FC<types.PageProps> = ({ site }) => {
+interface PageHeadProps {
+  site?: Site
+}
+
+export const PageHead = ({ site }: PageHeadProps) => {
   return (
     <Head>
       <meta charSet='utf-8' />

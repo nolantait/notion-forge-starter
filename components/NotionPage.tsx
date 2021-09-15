@@ -6,29 +6,40 @@ import { useRouter } from 'next/router'
 import { useSearchParam } from 'react-use'
 
 // Notion
-import { NotionRenderer } from 'notion-forge'
-import { PageBlock, ExtendedRecordMap } from 'notion-types'
+import { NotionRenderer, NotionRendererProps } from 'notion-forge'
+import {
+  PageBlock,
+  ExtendedRecordMap,
+  PageProps,
+  ErrorPageProps,
+  ResolvedPageProps,
+  Site
+} from '@types'
+import { PageLink } from '@notion/page-link'
 
 // Lib
-import { mapPageUrl, getCanonicalPageUrl } from 'lib/map-page-url'
-import { mapNotionImageUrl } from 'lib/map-image-url'
-import { getPageDescription } from 'lib/get-page-description'
-import { getBlockKeys } from 'lib/get-block-keys'
-import { getPageStyle } from 'lib/get-page-style'
-import { getPageTitle } from 'lib/get-page-title'
-import { PageProps, ErrorPageProps, ResolvedPageProps } from 'lib/types'
-import { Config } from 'lib/config'
+import {
+  Config,
+  getBlockKeys,
+  getPageStyle,
+  getPageTitle,
+  getPageDescription,
+  mapPageUrl,
+  mapNotionImageUrl,
+  getCanonicalPageUrl
+} from '@lib'
 
 // Components
-import { Loading } from '../layouts/loading'
-import { Page404 } from '../layouts/page-404'
-import { PageLink } from './notion/page-link'
-import { SocialDescription } from '../layouts/social-description'
-import { SocialImage } from '../layouts/social-image'
-import { CanonicalPageUrl } from '../layouts/canonical-page-url'
+import {
+  Loading,
+  Page404,
+  SocialDescription,
+  SocialImage,
+  CanonicalPage
+} from '@layouts'
 
 // Styles
-import styles from '../layouts/styles.module.scss'
+import styles from '@layouts/styles.module.scss'
 
 const CustomizedComponents = {
   pageLink: PageLink
@@ -53,6 +64,8 @@ interface Page {
 
 const RenderNotionPage: React.FC<ResolvedPageProps> = (props) => {
   const { recordMap, pageId, site } = props
+  if (!pageId) throw new Error('Missing page ID when rendering')
+
   const router = useRouter()
   const lite = useSearchParam('lite')
   const previewImages = site.previewImages !== false
@@ -80,16 +93,16 @@ const RenderNotionPage: React.FC<ResolvedPageProps> = (props) => {
   const bodyClass = getBodyStyleForPage(page, isLiteMode)
 
   // Page URL Settings
-  const { siteMapPageUrl, canonicalPageUrl } = getPageUrlSettings({
+  const { siteMapPageUrl, canonicalPageUrl } = getPageUrlSettings(
     site,
     recordMap,
     searchParams,
     pageId
-  })
+  )
 
   const { defaultPageIcon, defaultPageCover, defaultPageCoverPosition } = Config
 
-  const notionRendererProps = {
+  const notionRendererProps: NotionRendererProps = {
     recordMap,
     previewImages,
     defaultPageIcon,
@@ -113,7 +126,7 @@ const RenderNotionPage: React.FC<ResolvedPageProps> = (props) => {
 
         <SocialImage image={socialImage} />
 
-        {canonicalPageUrl && <CanonicalPageUrl url={canonicalPageUrl} />}
+        {canonicalPageUrl && <CanonicalPage url={canonicalPageUrl} />}
 
         <title>{title}</title>
       </Head>
@@ -126,12 +139,12 @@ const RenderNotionPage: React.FC<ResolvedPageProps> = (props) => {
 }
 
 function shouldRenderError(props: PageProps): boolean {
-  if (props.error) {
-    return true
-  }
+  if (props.error) return true
 
   const { recordMap } = props
   const { rootKey } = getBlockKeys(recordMap)
+
+  if (!rootKey) return true
 
   const block = recordMap?.block[rootKey]?.value
   const isInvalid = !rootKey || !block
@@ -158,23 +171,37 @@ function getBodyStyleForPage(page: Page, lite: boolean): string[] {
   return lite ? style.concat(['notion-lite']) : style
 }
 
-function getSocialInfoForPage(page: Page) {
+function getSocialInfoForPage(page: Page): {
+  socialImage: string | undefined
+  socialDescription: string | undefined
+} {
   const { block, recordMap } = page
+  const { format } = block
+  const { page_cover } = format
+  const pageDescription = getPageDescription(block, recordMap)
 
-  const socialImage = mapNotionImageUrl(
-    block.format?.page_cover || Config.defaultPageCover,
-    block
-  )
-  const socialDescription =
-    getPageDescription(block, recordMap) ?? Config.description
+  const socialImageCover = page_cover ?? Config.defaultPageCover
+  const socialDescription = pageDescription ?? Config.description
+
+  const socialImage =
+    socialImageCover && mapNotionImageUrl(socialImageCover, block)
 
   return { socialImage, socialDescription }
 }
 
-function getPageUrlSettings({ site, recordMap, searchParams, pageId }) {
+function getPageUrlSettings(
+  site: Site,
+  recordMap: ExtendedRecordMap,
+  searchParams: URLSearchParams,
+  pageId: string
+): {
+  siteMapPageUrl: (pageId?: string) => string
+  canonicalPageUrl: string | undefined
+} {
   const siteMapPageUrl = mapPageUrl(site, recordMap, searchParams)
-  const canonicalPageUrl =
-    !Config.isDev && getCanonicalPageUrl(site, recordMap)(pageId)
+  const canonicalPageUrl = Config.isDev
+    ? undefined
+    : getCanonicalPageUrl(site, recordMap)(pageId)
 
   return { siteMapPageUrl, canonicalPageUrl }
 }

@@ -1,6 +1,6 @@
 import { getAllPages } from './get-all-pages'
 import { getSites } from './get-sites'
-import { SiteMap } from './types'
+import { SiteMap } from '@types'
 import pMap from 'p-map'
 
 export async function getSiteMaps(): Promise<SiteMap[]> {

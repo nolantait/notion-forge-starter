@@ -4,7 +4,11 @@ import { PageHead } from './page-head'
 
 import styles from './styles.module.scss'
 
-export const ErrorPage: React.FC<{ statusCode: number }> = ({ statusCode }) => {
+interface ErrorPageProps {
+  statusCode: number
+}
+
+export const ErrorPage = ({ statusCode }: ErrorPageProps) => {
   const title = 'Error'
 
   return (
